@@ -1,0 +1,107 @@
+global:
+  storageClass: ""
+
+wordpress:
+  image:
+    repository: "marcusayan/wordpress-custom"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    type: ClusterIP
+    port: 80
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteMany
+    size: 10Gi
+  env:
+    WORDPRESS_DB_HOST: wordpress-mysql
+    WORDPRESS_DB_USER: wordpress
+    WORDPRESS_DB_PASSWORD: wordpress-password
+    WORDPRESS_DB_NAME: wordpress
+    WORDPRESS_CONFIG_EXTRA: |
+      define('WP_DEBUG', false);
+      define('WP_MEMORY_LIMIT', '256M');
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+nginx:
+  enabled: true
+  image:
+    repository: "marcusayan/nginx-openresty"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    type: LoadBalancer
+    port: 80
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /health
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+mariadb:
+  enabled: true
+  image:
+    repository: "marcusayan/mysql-custom"
+    tag: "latest"
+  auth:
+    rootPassword: "root-password"
+    password: "wordpress-password"
+    database: "wordpress"
+    username: "wordpress"
+  primary:
+    persistence:
+      enabled: true
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+volumes:
+  - name: wordpress-persistent-storage
+    persistentVolumeClaim:
+      claimName: wordpress-pvc
+  - name: mysql-persistent-storage
+    persistentVolumeClaim:
+      claimName: mysql-pvc
