@@ -1,0 +1,83 @@
+grafana:
+  adminPassword: "admin123"
+  service:
+    type: LoadBalancer
+    port: 3000
+  ingress:
+    enabled: false
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      wordpress-dashboard:
+        gnetId: 0
+        revision: 0
+        datasource: Prometheus
+      nginx-dashboard:
+        gnetId: 0
+        revision: 0
+        datasource: Prometheus
+
+prometheus:
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+
+alertmanager:
+  config:
+    global:
+      smtp_smarthost: 'localhost:25'
+      smtp_from: 'alertmanager@example.com'
+    route:
+      group_by: ['job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'webhook'
+    receivers:
+    - name: 'webhook'
+      webhook_configs:
+      - url: 'http://example.com/'
+
+defaultRules:
+  rules:
+    alertmanager: true
+    etcd: true
+    configReloaders: true
+    general: true
+    k8s: true
+    kubeApiserverAvailability: true
+    kubeApiserverBurnrate: true
+    kubeApiserverHistogram: true
+    kubeApiserverSlos: true
+    kubelet: true
+    kubeProxy: true
+    kubePrometheusGeneral: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    network: true
+    node: true
+    nodeExporterAlerting: true
+    nodeExporterRecording: true
+    prometheus: true
+    prometheusOperator: true
+
+prometheus-node-exporter:
+  enabled: true
+
+kube-state-metrics:
+  enabled: true

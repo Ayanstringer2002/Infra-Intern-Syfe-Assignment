@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      component: wordpress
+  endpoints:
+  - port: http
+    interval: 30s
+    path: /metrics
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      component: nginx
+  endpoints:
+  - port: http
+    interval: 30s
+    path: /nginx_status
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+data:
+  wordpress-dashboard.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "WordPress Dashboard",
+        "tags": ["wordpress", "nginx"],
+        "timezone": "browser",
+        "panels": [],
+        "time": {
+          "from": "now-6h",
+          "to": "now"
+        },
+        "refresh": "5s"
+      }
+    }
