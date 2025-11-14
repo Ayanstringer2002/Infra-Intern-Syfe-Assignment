@@ -37,5 +37,56 @@ This project deploys a production-grade WordPress application on Kubernetes with
 - Database query time
 - PHP-FPM queue length
 - Disk utilization
+
+## Nginx Metrics
+- Total request count
+- Total 5xx error count
+- Active connections
+- Requests/sec
+- Upstream response latency
+- OpenResty Lua custom metrics
+
+## MySQL Metrics
+- QPS (Queries per second)
+- Slow query count
+- Buffer pool size
+- Disk IOPS
+- Replication lag (if configured)
+
+## Scale Nginx
+  ```bash
+  kubectl scale deploy my-release-nginx --replicas=3
+  ```
+
+## Scale Wordpress
+   ```bash
+   kubectl scale deploy my-release-wordpress --replicas=3
+   ```
+## Project Structure
+```
+wordpress-kubernetes/
+│
+├── docker/
+│   ├── wordpress/      # Custom PHP-FPM WordPress build
+│   ├── nginx/          # OpenResty with Lua build
+│   └── mysql/          # Custom MySQL image
+│
+├── helm/
+│   └── wordpress-stack/
+│       ├── charts/     # Subcharts (Prometheus, Grafana)
+│       ├── templates/  # Kubernetes manifests
+│       ├── values.yaml
+│       └── Chart.yaml
+│
+├── monitoring/
+│   ├── dashboards/     # Grafana dashboards JSON
+│   └── alerts/         # Prometheus alert rules
+│
+└── README.md
+```
+
+
+
+   
     
   
