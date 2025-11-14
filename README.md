@@ -30,5 +30,12 @@ This project deploys a production-grade WordPress application on Kubernetes with
    ```bash
    minikube service wordpress-nginx --url
    minikube service monitoring-grafana --url
+
+## WordPress Metrics
+- Page load time
+- Requests per second
+- Database query time
+- PHP-FPM queue length
+- Disk utilization
     
   
