@@ -31,6 +31,31 @@ This project deploys a production-grade WordPress application on Kubernetes with
    minikube service wordpress-nginx --url
    minikube service monitoring-grafana --url
 
+## Project Structure
+```
+wordpress-kubernetes/
+│
+├── docker/
+│   ├── wordpress/      # Custom PHP-FPM WordPress build
+│   ├── nginx/          # OpenResty with Lua build
+│   └── mysql/          # Custom MySQL image
+│
+├── helm/
+│   └── wordpress-stack/
+│       ├── charts/     # Subcharts (Prometheus, Grafana)
+│       ├── templates/  # Kubernetes manifests
+│       ├── values.yaml
+│       └── Chart.yaml
+│
+├── monitoring/
+│   ├── dashboards/     # Grafana dashboards JSON
+│   └── alerts/         # Prometheus alert rules
+│
+└── README.md
+
+```
+
+
 ## WordPress Metrics
 - Page load time
 - Requests per second
@@ -62,31 +87,39 @@ This project deploys a production-grade WordPress application on Kubernetes with
    ```bash
    kubectl scale deploy my-release-wordpress --replicas=3
    ```
-## Project Structure
-```
-wordpress-kubernetes/
-│
-├── docker/
-│   ├── wordpress/      # Custom PHP-FPM WordPress build
-│   ├── nginx/          # OpenResty with Lua build
-│   └── mysql/          # Custom MySQL image
-│
-├── helm/
-│   └── wordpress-stack/
-│       ├── charts/     # Subcharts (Prometheus, Grafana)
-│       ├── templates/  # Kubernetes manifests
-│       ├── values.yaml
-│       └── Chart.yaml
-│
-├── monitoring/
-│   ├── dashboards/     # Grafana dashboards JSON
-│   └── alerts/         # Prometheus alert rules
-│
-└── README.md
-```
+## Backup & Restore
+1. **MySQL Backups**:
+  - Use CronJob for automatic database dump
+  - Store backups to Cloud / NFS storage
+2. **WordPress Media Backup**:
+  - Backup RWX PVC using Velero or rsync
+
+## Troubleshooting
+1. **Nginx not forwarding traffic?**:
+  - Check Lua scripts
+  - Validate proxy_pass
+  - Confirm WordPress service running
+2. **WordPress cannot connect to DB?**:
+  - Validate DB host in environment
+  - Ensure MySQL root password matches values.yaml
+3. **Prometheus not scraping?**:
+  - Validate serviceMonitor resources
+  - Ensure exporters are exposed
+  - Check Prometheus targets UI
+
+## CleanUp
+   ```bash
+   helm uninstall my-release
+   kubectl delete pvc --all
+   ```
+## Future Enhancements
+  - Add Redis cache layer
+  - Enable HTTPS with Cert-Manager
+  - Add HPA (Horizontal Pod Autoscaler)
+  - Add loki + promtail log aggregation
+  - Add S3 storage integration
 
 
 
-   
     
   
