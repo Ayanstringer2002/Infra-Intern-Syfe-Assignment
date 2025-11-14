@@ -21,5 +21,14 @@ This project deploys a production-grade WordPress application on Kubernetes with
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Ayanstringer2002/Infra-Intern-Syfe-Assignment.git
    cd wordpress-kubernetes
+2. **Run automated deployment**:
+   ```bash
+   .\deploy.ps1
+3. **Access your applications**:
+   ```bash
+   minikube service wordpress-nginx --url
+   minikube service monitoring-grafana --url
+    
+  
